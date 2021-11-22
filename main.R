@@ -183,9 +183,115 @@ if(round(PopulationPatchDF["MtMenz", "NewPointsToGenerate"],0) > 0){
                                     iter = 25)
 }
 
-#newOccurences <- occurenceGBIF[]
+# Now we have to write the generated points to the species occurences csv
+
+# Create point csv directory
+if(!dir.exists("data/points")){
+  dir.create("data/points")
+}
+
+# BaleMountains
+if(exists(x = "occurencesBaleMountains")){
+  write.table(occurencesBaleMountains, file = "data/points/BaleMountains.csv", row.names = F, sep = ",")
+  BaleMountainsFile <- read.csv("data/points/BaleMountains.csv")
+  BaleMountainsFile$species <- "Canis simensis"
+  colnames(BaleMountainsFile) <- c("Longitude", "Latitude","species")
+  BaleMountainsFile <- BaleMountainsFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(occurenceGBIF, BaleMountainsFile)
+}
+
+# ArsiMountains
+if(exists(x = "occurencesArsiMountains")){
+  write.table(occurencesArsiMountains, file = "data/points/ArtsiMountains.csv", row.names = F, sep = ",")
+  ArsiMountainsFile <- read.csv("data/points/ArtsiMountains.csv")
+  ArsiMountainsFile$species <- "Canis simensis"
+  colnames(ArsiMountainsFile) <- c("Longitude", "Latitude","species")
+  ArsiMountainsFile <- ArsiMountainsFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(occurenceGBIF, ArsiMountainsFile)
+}
 
 
+# SimienNP
+if(exists(x = "occurencesSimienNP")){
+  write.table(occurencesSimienNP, file = "data/points/SimienNP.csv", row.names = F, sep = ",")
+  SimienNPFile <- read.csv("data/points/SimienNP.csv")
+  SimienNPFile$species <- "Canis simensis"
+  colnames(SimienNPFile) <- c("Longitude", "Latitude","species")
+  SimienNPFile <- SimienNPFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, SimienNPFile)
+}
 
+# SimienNP
+if(exists(x = "occurencesSimienNP")){
+  write.table(occurencesArsiMountains, file = "data/points/SimienNP.csv", row.names = F, sep = ",")
+  SimienNPFile <- read.csv("data/points/SimienNP.csv")
+  SimienNPFile$species <- "Canis simensis"
+  colnames(SimienNPFile) <- c("Longitude", "Latitude","species")
+  SimienNPFile <- SimienNPFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, SimienNPFile)
+}
 
+# NorthWollo
+if(exists(x = "occurencesNorthWollo")){
+  write.table(occurencesNorthWollo, file = "data/points/NorthWollo.csv", row.names = F, sep = ",")
+  NorthWolloFile <- read.csv("data/points/NorthWollo.csv")
+  NorthWolloFile$species <- "Canis simensis"
+  colnames(NorthWolloFile) <- c("Longitude", "Latitude","species")
+  NorthWolloFile <- NorthWolloFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, NorthWolloFile)
+}
+
+# SouthWollo
+if(exists(x = "occurencesSouthWollo")){
+  write.table(occurencesSouthWollo, file = "data/points/SouthWollo.csv", row.names = F, sep = ",")
+  SouthWolloFile <- read.csv("data/points/SouthWollo.csv")
+  SouthWolloFile$species <- "Canis simensis"
+  colnames(SouthWolloFile) <- c("Longitude", "Latitude","species")
+  SouthWolloFile <- SouthWolloFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, SouthWolloFile)
+}
+
+# MtGuna
+if(exists(x = "occurencesMtGuna")){
+  write.table(occurencesMtGuna, file = "data/points/MtGuna.csv", row.names = F, sep = ",")
+  MtGunaFile <- read.csv("data/points/MtGuna.csv")
+  MtGunaFile$species <- "Canis simensis"
+  colnames(MtGunaFile) <- c("Longitude", "Latitude","species")
+  MtGunaFile <- MtGunaFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, MtGunaFile)
+}
+
+# MtChoke
+if(exists(x = "occurencesMtChoke")){
+  write.table(occurencesMtChoke, file = "data/points/MtChoke.csv", row.names = F, sep = ",")
+  MtChokeFile <- read.csv("data/points/MtChoke.csv")
+  MtChokeFile$species <- "Canis simensis"
+  colnames(MtChokeFile) <- c("Longitude", "Latitude","species")
+  MtChokeFile <- MtChokeFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, MtChokeFile)
+}
+
+# MtGosh
+if(exists(x = "occurencesMtGosh")){
+  write.table(occurencesMtGosh, file = "data/points/MtGosh.csv", row.names = F, sep = ",")
+  MtGoshFile <- read.csv("data/points/MtGosh.csv")
+  MtGoshFile$species <- "Canis simensis"
+  colnames(MtGoshFile) <- c("Longitude", "Latitude","species")
+  MtGoshFile <- MtGoshFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, MtGoshFile)
+}
+
+# MtMenz
+if(exists(x = "occurencesMtMenz")){
+  write.table(occurencesMtMenz, file = "data/points/MtMenz.csv", row.names = F, sep = ",")
+  MtMenzFile <- read.csv("data/points/MtMenz.csv")
+  MtMenzFile$species <- "Canis simensis"
+  colnames(MtMenzFile) <- c("Longitude", "Latitude","species")
+  MtMenzFile <- MtMenzFile[,c(3,1,2)] 
+  OccurencesPoints <- rbind(OccurencesPoints, MtMenzFile)
+}
+
+# Check OccurencesPoints dataset
+plot(Ethiopia)
+points(OccurencesPoints$Longitude, OccurencesPoints$Latitude)
 
