@@ -295,3 +295,13 @@ if(exists(x = "occurencesMtMenz")){
 plot(Ethiopia)
 points(OccurencesPoints$Longitude, OccurencesPoints$Latitude)
 
+# Get a 30% testing set and a 70% training set and export them to your folder.
+
+smp_size <- floor(0.7 * nrow(OccurencesPoints))
+set.seed(123)
+train_ind <- sample(seq_len(nrow(OccurencesPoints)), size = smp_size)
+train <- OccurencesPoints[train_ind, ]
+test <- OccurencesPoints[-train_ind, ]
+
+write.csv(train, "data/points/train.csv", row.names=FALSE)
+write.csv(test, "data/points/test.csv", row.names=FALSE)
