@@ -32,17 +32,28 @@ Ethiopia <- raster::getData(name = "GADM", path = dir, country = "ETH", level = 
 HabitatPatches <- readOGR("data/", "HabitatPatches")
 HabitatPatchesSf <- st_as_sf(HabitatPatches)
 
-# Make separate polygons of different habitats
+## Make separate polygons of different habitats ##
+
+# First for the multipolygon landscapes
 BaleMountains <- st_union(HabitatPatchesSf[1,"LEGEND"], HabitatPatchesSf[7,"LEGEND"])
 BaleMountains <- BaleMountains[,-2]
-SouthWollo <- HabitatPatchesSf[2,"LEGEND"]
-SimienNP <- HabitatPatchesSf[3,"LEGEND"]
+
 ArsiMountains <- st_union(HabitatPatchesSf[4,"LEGEND"], HabitatPatchesSf[5,"LEGEND"])
 ArsiMountains <- ArsiMountains[,-2]
-MtGuna <- HabitatPatchesSf[6,"LEGEND"]
-MtChoke <- HabitatPatchesSf[13,"LEGEND"]
+
 NorthWollo <- st_union(HabitatPatchesSf[9,"LEGEND"], HabitatPatchesSf[10,"LEGEND"],
                        HabitatPatchesSf[11,"LEGEND"], HabitatPatchesSf[12,"LEGEND"])
 NorthWollo <- NorthWollo[,-2]
+
+# Then for the single polygon landscapes
+SouthWollo <- HabitatPatchesSf[2,"LEGEND"]
+
+SimienNP <- HabitatPatchesSf[3,"LEGEND"]
+
+MtGuna <- HabitatPatchesSf[6,"LEGEND"]
+
+MtChoke <- HabitatPatchesSf[13,"LEGEND"]
+
 MtGosh <- HabitatPatchesSf[8,"LEGEND"]
+
 MtMenz <- HabitatPatchesSf[14,"LEGEND"]
