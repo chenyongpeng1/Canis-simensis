@@ -1,0 +1,48 @@
+# Project Etiopian Wolf (Canis simensis)
+# Species Distribution Modelling
+# Wildlife Ecology and Conservation (REG32806)
+# Wageningen University
+# Group 12
+
+# Install required packages
+if(!"raster" %in% rownames(installed.packages())){install.packages("raster")}
+if(!"rgdal" %in% rownames(installed.packages())){install.packages("rgdal")}
+if(!"sf" %in% rownames(installed.packages())){install.packages("sf")}
+if(!"dplyr" %in% rownames(installed.packages())){install.packages("dplyr")}
+
+# Load required packages
+library(raster)
+library(rgdal)
+library(sf)
+library(dplyr)
+
+# Create data directory
+dir <- "data"
+if(!dir.exists(dir)){
+  dir.create(dir)
+}
+
+# Add points from GBIF
+occurenceGBIF <- read.csv("data/SpeciesCoordinates.csv")
+
+# Download Ethiopian administrative shape
+Ethiopia <- raster::getData(name = "GADM", path = dir, country = "ETH", level = 0)
+
+# Import habitat patches created from QGIS
+HabitatPatches <- readOGR("data/", "HabitatPatches")
+HabitatPatchesSf <- st_as_sf(HabitatPatches)
+
+# Make separate polygons of different habitats
+BaleMountains <- st_union(HabitatPatchesSf[1,"LEGEND"], HabitatPatchesSf[7,"LEGEND"])
+BaleMountains <- BaleMountains[,-2]
+SouthWollo <- HabitatPatchesSf[2,"LEGEND"]
+SimienNP <- HabitatPatchesSf[3,"LEGEND"]
+ArsiMountains <- st_union(HabitatPatchesSf[4,"LEGEND"], HabitatPatchesSf[5,"LEGEND"])
+ArsiMountains <- ArsiMountains[,-2]
+MtGuna <- HabitatPatchesSf[6,"LEGEND"]
+MtChoke <- HabitatPatchesSf[13,"LEGEND"]
+NorthWollo <- st_union(HabitatPatchesSf[9,"LEGEND"], HabitatPatchesSf[10,"LEGEND"],
+                       HabitatPatchesSf[11,"LEGEND"], HabitatPatchesSf[12,"LEGEND"])
+NorthWollo <- NorthWollo[,-2]
+MtGosh <- HabitatPatchesSf[8,"LEGEND"]
+MtMenz <- HabitatPatchesSf[14,"LEGEND"]
