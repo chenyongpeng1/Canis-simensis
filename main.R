@@ -112,29 +112,76 @@ rownames(PopulationPatchDF) <- Landscape
 # Step 2: Generate random points in the landscapes according to the data in PopulationPatchDF
 
 # Bale Mountains
-if(floor(PopulationPatchDF["BaleMountains", "NewPointsToGenerate"]) > 0){
+if(round(PopulationPatchDF["BaleMountains", "NewPointsToGenerate"], 0) > 0){
   occurencesBaleMountaints <- sp::spsample(BaleMountains, 
-               floor(PopulationPatchDF["BaleMountains", "NewPointsToGenerate"]),
+               round(PopulationPatchDF["BaleMountains", "NewPointsToGenerate"], 0),
                type = "random",
                iter = 25)
 }
 
 # ArsiMountains
-if(floor(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"]) > 0){
+if(round(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"],0) > 0){
   occurencesArsiMountains <- sp::spsample(ArsiMountains, 
-                                           floor(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"]),
-                                           type = "random",
-                                           iter = 25)
+              round(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
 }
 
 # SimienNP
-if(floor(PopulationPatchDF["SimienNP", "NewPointsToGenerate"]) > 0){
+if(round(PopulationPatchDF["SimienNP", "NewPointsToGenerate"],0) > 0){
   occurencesSimienNP <- sp::spsample(SimienNP, 
-                                          floor(PopulationPatchDF["SimienNP", "NewPointsToGenerate"]),
-                                          type = "random",
-                                          iter = 25)
+              round(PopulationPatchDF["SimienNP", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
 }
 
+# NorthWollo
+if(round(PopulationPatchDF["NorthWollo", "NewPointsToGenerate"],0) > 0){
+  occurencesNorthWollo <- sp::spsample(NorthWollo, 
+              round(PopulationPatchDF["NorthWollo", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
+}
+
+# SouthWollo
+if(round(PopulationPatchDF["SouthWollo", "NewPointsToGenerate"],0) > 0){
+  occurencesSouthWollo <- sp::spsample(SouthWollo, 
+              round(PopulationPatchDF["SouthWollo", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
+}
+
+# MtGuna
+if(round(PopulationPatchDF["MtGuna", "NewPointsToGenerate"],0) > 0){
+  occurencesMtGuna <- sp::spsample(MtGuna, 
+              round(PopulationPatchDF["MtGuna", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
+}
+
+# MtChoke
+if(round(PopulationPatchDF["MtChoke", "NewPointsToGenerate"],0) > 0){
+  occurencesMtChoke <- sp::spsample(MtChoke, 
+              round(PopulationPatchDF["MtChoke", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
+}
+
+# MtGosh
+if(round(PopulationPatchDF["MtGosh", "NewPointsToGenerate"],0) > 0){
+  occurencesMtGosh <- sp::spsample(MtGosh, 
+              round(PopulationPatchDF["MtGosh", "NewPointsToGenerate"],0),
+              type = "random",
+              iter = 25)
+}
+
+# MtMenz
+if(round(PopulationPatchDF["MtMenz", "NewPointsToGenerate"],0) > 0){
+  occurencesMtMenz <- sp::spsample(MtMenz, 
+                                    round(PopulationPatchDF["MtMenz", "NewPointsToGenerate"],0),
+                                    type = "random",
+                                    iter = 25)
+}
 
 #newOccurences <- occurenceGBIF[]
 
