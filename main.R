@@ -37,26 +37,35 @@ HabitatPatchesSf <- st_as_sf(HabitatPatches)
 # First for the multipolygon landscapes
 BaleMountains <- st_union(HabitatPatchesSf[1,"LEGEND"], HabitatPatchesSf[7,"LEGEND"])
 BaleMountains <- BaleMountains[,-2]
+BaleMountains <- as_Spatial(BaleMountains)
 
 ArsiMountains <- st_union(HabitatPatchesSf[4,"LEGEND"], HabitatPatchesSf[5,"LEGEND"])
 ArsiMountains <- ArsiMountains[,-2]
+ArsiMountains <- as_Spatial(ArsiMountains)
 
 NorthWollo <- st_union(HabitatPatchesSf[9,"LEGEND"], HabitatPatchesSf[10,"LEGEND"],
                        HabitatPatchesSf[11,"LEGEND"], HabitatPatchesSf[12,"LEGEND"])
 NorthWollo <- NorthWollo[,-2]
+NorthWollo <- as_Spatial(NorthWollo)
 
 # Then for the single polygon landscapes
 SouthWollo <- HabitatPatchesSf[2,"LEGEND"]
+SouthWollo <- as_Spatial(SouthWollo)
 
 SimienNP <- HabitatPatchesSf[3,"LEGEND"]
+SimienNP <- as_Spatial(SimienNP)
 
 MtGuna <- HabitatPatchesSf[6,"LEGEND"]
+MtGuna <- as_Spatial(MtGuna)
 
 MtChoke <- HabitatPatchesSf[13,"LEGEND"]
+MtChoke <- as_Spatial(MtChoke)
 
 MtGosh <- HabitatPatchesSf[8,"LEGEND"]
+MtGosh <- as_Spatial(MtGosh)
 
 MtMenz <- HabitatPatchesSf[14,"LEGEND"]
+MtMenz <- as_Spatial(MtMenz)
 
 # Visualize different occurence locations in Ethiopia
 plot(Ethiopia)
@@ -92,9 +101,26 @@ Landscape <- c("BaleMountains", "ArsiMountains", "SimienNP", "NorthWollo",
 Population <- c(250, 100, 47, 21, 17, 8, 0, 0, 20)
 OccurencesGBIF <- c(48, 0, 3, 0, 0, 0, 0, 0, 0)
 OccurenceRatio <- c(rep(0.192, 9))
-PopulationPatchDF <- data.frame(Landscape, Population, OccurencesGBIF,
+PopulationPatchDF <- data.frame(Population, OccurencesGBIF,
                                 OccurenceRatio)
 PopulationPatchDF["NewPointsToGenerate"] <- 
   (PopulationPatchDF["Population"] * PopulationPatchDF["OccurenceRatio"]) - PopulationPatchDF["OccurencesGBIF"]
+rownames(PopulationPatchDF) <- Landscape
 
-# Now we know how many points we want to generate per habitat patch
+# Now we know how many points we want to generate per habitat patch, column 5 of PopulationPatchDF
+
+# Step 2: Generate random points in the landscapes according to the data in PopulationPatchDF
+
+# ArsiMountains
+ArsiMountains
+occurencesArsiMountains <- sp::spsample(ArsiMountains, 
+                                    floor(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"]),
+                                    type = "random",
+                                    iter = 25)
+
+#newOccurences <- occurenceGBIF[]
+
+
+
+
+
