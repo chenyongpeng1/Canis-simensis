@@ -32,7 +32,7 @@ Ethiopia <- raster::getData(name = "GADM", path = dir, country = "ETH", level = 
 HabitatPatches <- readOGR("data/", "HabitatPatches")
 HabitatPatchesSf <- st_as_sf(HabitatPatches)
 
-## Make separate polygons of different habitats ##
+# Make separate polygons of different habitats #
 
 # First for the multipolygon landscapes
 BaleMountains <- st_union(HabitatPatchesSf[1,"LEGEND"], HabitatPatchesSf[7,"LEGEND"])
@@ -57,3 +57,20 @@ MtChoke <- HabitatPatchesSf[13,"LEGEND"]
 MtGosh <- HabitatPatchesSf[8,"LEGEND"]
 
 MtMenz <- HabitatPatchesSf[14,"LEGEND"]
+
+# Visualize different occurence locations in Ethiopia
+plot(Ethiopia)
+plot(BaleMountains, col = "red", add = T)
+plot(ArsiMountains, col = "blue", add = T)
+plot(SimienNP, col = "yellow", add = T)
+plot(NorthWollo, col = "cyan", add = T)
+plot(SouthWollo, col = "black", add = T)
+plot(MtGuna, col = "grey", add = T)
+plot(MtChoke, col = "lightgreen", add = T)
+plot(MtGosh, col = "darkorange", add = T)
+plot(MtMenz, col = "darkolivegreen", add = T)
+
+# Add points form GBIF to the map
+points(occurenceGBIF$Longitude, occurenceGBIF$Latitude)
+
+# A
