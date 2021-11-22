@@ -73,4 +73,28 @@ plot(MtMenz, col = "darkolivegreen", add = T)
 # Add points form GBIF to the map
 points(occurenceGBIF$Longitude, occurenceGBIF$Latitude)
 
-# A
+# We want to generate more occurrence points of the Ethiopian wolf to create a
+# better representation of its current range. Therefore we want to generate
+# random occurrence points in the landscapes where the wolf has little to no
+# GBIF points. We will proportionally assign points to these landscapes with 
+# occurence data from Marino (2003). We have 48 occurences from GBIF in Bale
+# Mountains. According to Marino (2003), there are 250 Ethiopian wolfs in
+# this mountain range. This means that the ratio GBIF occurences : population
+# is equal to 48 / 250 = 0.192 in Bale national park. We will use this ratio
+# to determine the number of points we want to generate in the other habitat patches.
+
+# Step 1: Create a dataframe with the different landscapes, their population
+# sizes according to Marino (2003) (we will take the avarage value of the 
+# population estimate range), and the number of points that are in that landscape.
+
+Landscape <- c("BaleMountains", "ArsiMountains", "SimienNP", "NorthWollo",
+                  "SouthWollo", "MtGuna", "MtChoke", "MtGosh", "MtMenz")
+Population <- c(250, 100, 47, 21, 17, 8, 0, 0, 20)
+OccurencesGBIF <- c(48, 0, 3, 0, 0, 0, 0, 0, 0)
+OccurenceRatio <- c(rep(0.192, 9))
+PopulationPatchDF <- data.frame(Landscape, Population, OccurencesGBIF,
+                                OccurenceRatio)
+PopulationPatchDF["NewPointsToGenerate"] <- 
+  (PopulationPatchDF["Population"] * PopulationPatchDF["OccurenceRatio"]) - PopulationPatchDF["OccurencesGBIF"]
+
+# Now we know how many points we want to generate per habitat patch
