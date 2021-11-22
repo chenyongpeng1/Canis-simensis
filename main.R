@@ -111,12 +111,30 @@ rownames(PopulationPatchDF) <- Landscape
 
 # Step 2: Generate random points in the landscapes according to the data in PopulationPatchDF
 
+# Bale Mountains
+if(floor(PopulationPatchDF["BaleMountains", "NewPointsToGenerate"]) > 0){
+  occurencesBaleMountaints <- sp::spsample(BaleMountains, 
+               floor(PopulationPatchDF["BaleMountains", "NewPointsToGenerate"]),
+               type = "random",
+               iter = 25)
+}
+
 # ArsiMountains
-ArsiMountains
-occurencesArsiMountains <- sp::spsample(ArsiMountains, 
-                                    floor(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"]),
-                                    type = "random",
-                                    iter = 25)
+if(floor(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"]) > 0){
+  occurencesArsiMountains <- sp::spsample(ArsiMountains, 
+                                           floor(PopulationPatchDF["ArsiMountains", "NewPointsToGenerate"]),
+                                           type = "random",
+                                           iter = 25)
+}
+
+# SimienNP
+if(floor(PopulationPatchDF["SimienNP", "NewPointsToGenerate"]) > 0){
+  occurencesSimienNP <- sp::spsample(SimienNP, 
+                                          floor(PopulationPatchDF["SimienNP", "NewPointsToGenerate"]),
+                                          type = "random",
+                                          iter = 25)
+}
+
 
 #newOccurences <- occurenceGBIF[]
 
