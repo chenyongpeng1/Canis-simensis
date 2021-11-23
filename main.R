@@ -23,13 +23,13 @@ if(!dir.exists(dir)){
 }
 
 # Add points from GBIF
-occurenceGBIF <- read.csv("data/SpeciesCoordinates.csv")
+occurenceGBIF <- read.csv("data/EthiopianWolves/SpeciesCoordinates.csv")
 
 # Download Ethiopian administrative shape
-Ethiopia <- raster::getData(name = "GADM", path = dir, country = "ETH", level = 0)
+Ethiopia <- raster::getData(name = "GADM", path = "data/QGIS files", country = "ETH", level = 0)
 
 # Import habitat patches created from QGIS
-HabitatPatches <- readOGR("data/", "HabitatPatches")
+HabitatPatches <- readOGR("data/QGIS files/", "HabitatPatches")
 HabitatPatchesSf <- st_as_sf(HabitatPatches)
 
 # Make separate polygons of different habitats #
@@ -186,14 +186,14 @@ if(round(PopulationPatchDF["MtMenz", "NewPointsToGenerate"],0) > 0){
 # Now we have to write the generated points to the species occurences csv
 
 # Create point csv directory
-if(!dir.exists("data/points")){
-  dir.create("data/points")
+if(!dir.exists("data/EthiopianWolves/points")){
+  dir.create("data/EthiopianWolves/points")
 }
 
 # BaleMountains
 if(exists(x = "occurencesBaleMountains")){
-  write.table(occurencesBaleMountains, file = "data/points/BaleMountains.csv", row.names = F, sep = ",")
-  BaleMountainsFile <- read.csv("data/points/BaleMountains.csv")
+  write.table(occurencesBaleMountains, file = "data/EthiopianWolves/points/BaleMountains.csv", row.names = F, sep = ",")
+  BaleMountainsFile <- read.csv("data/EthiopianWolves/points/BaleMountains.csv")
   BaleMountainsFile$species <- "Canis simensis"
   colnames(BaleMountainsFile) <- c("Longitude", "Latitude","species")
   BaleMountainsFile <- BaleMountainsFile[,c(3,1,2)] 
@@ -202,8 +202,8 @@ if(exists(x = "occurencesBaleMountains")){
 
 # ArsiMountains
 if(exists(x = "occurencesArsiMountains")){
-  write.table(occurencesArsiMountains, file = "data/points/ArtsiMountains.csv", row.names = F, sep = ",")
-  ArsiMountainsFile <- read.csv("data/points/ArtsiMountains.csv")
+  write.table(occurencesArsiMountains, file = "data/EthiopianWolves/points/ArtsiMountains.csv", row.names = F, sep = ",")
+  ArsiMountainsFile <- read.csv("data/EthiopianWolves/points/ArtsiMountains.csv")
   ArsiMountainsFile$species <- "Canis simensis"
   colnames(ArsiMountainsFile) <- c("Longitude", "Latitude","species")
   ArsiMountainsFile <- ArsiMountainsFile[,c(3,1,2)] 
@@ -213,8 +213,8 @@ if(exists(x = "occurencesArsiMountains")){
 
 # SimienNP
 if(exists(x = "occurencesSimienNP")){
-  write.table(occurencesSimienNP, file = "data/points/SimienNP.csv", row.names = F, sep = ",")
-  SimienNPFile <- read.csv("data/points/SimienNP.csv")
+  write.table(occurencesSimienNP, file = "data/EthiopianWolves/points/SimienNP.csv", row.names = F, sep = ",")
+  SimienNPFile <- read.csv("data/EthiopianWolves/points/SimienNP.csv")
   SimienNPFile$species <- "Canis simensis"
   colnames(SimienNPFile) <- c("Longitude", "Latitude","species")
   SimienNPFile <- SimienNPFile[,c(3,1,2)] 
@@ -223,8 +223,8 @@ if(exists(x = "occurencesSimienNP")){
 
 # SimienNP
 if(exists(x = "occurencesSimienNP")){
-  write.table(occurencesArsiMountains, file = "data/points/SimienNP.csv", row.names = F, sep = ",")
-  SimienNPFile <- read.csv("data/points/SimienNP.csv")
+  write.table(occurencesArsiMountains, file = "data/EthiopianWolves/points/SimienNP.csv", row.names = F, sep = ",")
+  SimienNPFile <- read.csv("data/EthiopianWolves/points/SimienNP.csv")
   SimienNPFile$species <- "Canis simensis"
   colnames(SimienNPFile) <- c("Longitude", "Latitude","species")
   SimienNPFile <- SimienNPFile[,c(3,1,2)] 
@@ -233,8 +233,8 @@ if(exists(x = "occurencesSimienNP")){
 
 # NorthWollo
 if(exists(x = "occurencesNorthWollo")){
-  write.table(occurencesNorthWollo, file = "data/points/NorthWollo.csv", row.names = F, sep = ",")
-  NorthWolloFile <- read.csv("data/points/NorthWollo.csv")
+  write.table(occurencesNorthWollo, file = "data/EthiopianWolves/points/NorthWollo.csv", row.names = F, sep = ",")
+  NorthWolloFile <- read.csv("data/EthiopianWolves/points/NorthWollo.csv")
   NorthWolloFile$species <- "Canis simensis"
   colnames(NorthWolloFile) <- c("Longitude", "Latitude","species")
   NorthWolloFile <- NorthWolloFile[,c(3,1,2)] 
@@ -243,8 +243,8 @@ if(exists(x = "occurencesNorthWollo")){
 
 # SouthWollo
 if(exists(x = "occurencesSouthWollo")){
-  write.table(occurencesSouthWollo, file = "data/points/SouthWollo.csv", row.names = F, sep = ",")
-  SouthWolloFile <- read.csv("data/points/SouthWollo.csv")
+  write.table(occurencesSouthWollo, file = "data/EthiopianWolves/points/SouthWollo.csv", row.names = F, sep = ",")
+  SouthWolloFile <- read.csv("data/EthiopianWolves/points/SouthWollo.csv")
   SouthWolloFile$species <- "Canis simensis"
   colnames(SouthWolloFile) <- c("Longitude", "Latitude","species")
   SouthWolloFile <- SouthWolloFile[,c(3,1,2)] 
@@ -253,8 +253,8 @@ if(exists(x = "occurencesSouthWollo")){
 
 # MtGuna
 if(exists(x = "occurencesMtGuna")){
-  write.table(occurencesMtGuna, file = "data/points/MtGuna.csv", row.names = F, sep = ",")
-  MtGunaFile <- read.csv("data/points/MtGuna.csv")
+  write.table(occurencesMtGuna, file = "data/EthiopianWolves/points/MtGuna.csv", row.names = F, sep = ",")
+  MtGunaFile <- read.csv("data/EthiopianWolves/points/MtGuna.csv")
   MtGunaFile$species <- "Canis simensis"
   colnames(MtGunaFile) <- c("Longitude", "Latitude","species")
   MtGunaFile <- MtGunaFile[,c(3,1,2)] 
@@ -263,8 +263,8 @@ if(exists(x = "occurencesMtGuna")){
 
 # MtChoke
 if(exists(x = "occurencesMtChoke")){
-  write.table(occurencesMtChoke, file = "data/points/MtChoke.csv", row.names = F, sep = ",")
-  MtChokeFile <- read.csv("data/points/MtChoke.csv")
+  write.table(occurencesMtChoke, file = "data/EthiopianWolves/points/MtChoke.csv", row.names = F, sep = ",")
+  MtChokeFile <- read.csv("data/EthiopianWolves/points/MtChoke.csv")
   MtChokeFile$species <- "Canis simensis"
   colnames(MtChokeFile) <- c("Longitude", "Latitude","species")
   MtChokeFile <- MtChokeFile[,c(3,1,2)] 
@@ -273,8 +273,8 @@ if(exists(x = "occurencesMtChoke")){
 
 # MtGosh
 if(exists(x = "occurencesMtGosh")){
-  write.table(occurencesMtGosh, file = "data/points/MtGosh.csv", row.names = F, sep = ",")
-  MtGoshFile <- read.csv("data/points/MtGosh.csv")
+  write.table(occurencesMtGosh, file = "data/EthiopianWolves/points/MtGosh.csv", row.names = F, sep = ",")
+  MtGoshFile <- read.csv("data/EthiopianWolves/points/MtGosh.csv")
   MtGoshFile$species <- "Canis simensis"
   colnames(MtGoshFile) <- c("Longitude", "Latitude","species")
   MtGoshFile <- MtGoshFile[,c(3,1,2)] 
@@ -283,8 +283,8 @@ if(exists(x = "occurencesMtGosh")){
 
 # MtMenz
 if(exists(x = "occurencesMtMenz")){
-  write.table(occurencesMtMenz, file = "data/points/MtMenz.csv", row.names = F, sep = ",")
-  MtMenzFile <- read.csv("data/points/MtMenz.csv")
+  write.table(occurencesMtMenz, file = "data/EthiopianWolves/points/MtMenz.csv", row.names = F, sep = ",")
+  MtMenzFile <- read.csv("data/EthiopianWolves/points/MtMenz.csv")
   MtMenzFile$species <- "Canis simensis"
   colnames(MtMenzFile) <- c("Longitude", "Latitude","species")
   MtMenzFile <- MtMenzFile[,c(3,1,2)] 
@@ -303,5 +303,44 @@ train_ind <- sample(seq_len(nrow(OccurencesPoints)), size = smp_size)
 train <- OccurencesPoints[train_ind, ]
 test <- OccurencesPoints[-train_ind, ]
 
-write.csv(train, "data/points/train.csv", row.names=FALSE)
-write.csv(test, "data/points/test.csv", row.names=FALSE)
+write.csv(train, "data/SpeciesOccurences/train.csv", row.names=FALSE)
+write.csv(test, "data/SpeciesOccurences/test.csv", row.names=FALSE)
+
+# Now its time to import the climate variables. The 19 climate variarables are
+# saved in the directory "data/worldclim/wc2/"
+
+# Create path to climate variables
+path <- "data/worldclim/wc2/"
+
+# Get extent of Ethiopia
+extent <- extent(Ethiopia)
+e <- c(extent@xmin, extent@xmax, extent@ymin, extent@ymax)
+
+# List files in path
+files <- paste0(path,
+       "wc2.1_5m_bio_",
+       1:19,
+       ".tif")
+
+# Get all climate variables in a stack
+s <- stack(files)
+
+# Crop climate variables to extent
+s_cropped <- crop(s, e)
+names(s_cropped) <- paste0("bio", 1:19)
+
+# Path for input Maxent
+if(!dir.exists("InputMaxent")){
+  dir.create("InputMaxent")
+}
+
+pathMax <- "InputMaxent/"
+
+# Write cropped raster to data folder
+writeRaster(s_cropped, paste0(pathMax, names(s_cropped)),
+            bylayer=T, format="ascii", overwrite=T)
+
+
+
+
+
