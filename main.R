@@ -8,13 +8,15 @@
 if(!"raster" %in% rownames(installed.packages())){install.packages("raster")}
 if(!"rgdal" %in% rownames(installed.packages())){install.packages("rgdal")}
 if(!"sf" %in% rownames(installed.packages())){install.packages("sf")}
-if(!"dplyr" %in% rownames(installed.packages())){install.packages("dplyr")}
+if(!"ncdf4" %in% rownames(installed.packages())){install.packages("ncdf4")}
+if(!"spThin" %in% rownames(installed.packages())){install.packages("spThin")}
 
 # Load required packages
 library(raster)
 library(rgdal)
 library(sf)
-library(dplyr)
+library(ncdf4)
+library(spThin)
 
 # Create data directory
 dir <- "data"
@@ -339,6 +341,61 @@ pathMax <- "InputMaxent/"
 # Write cropped raster to data folder
 writeRaster(s_cropped, paste0(pathMax, names(s_cropped)),
             bylayer=T, format="ascii", overwrite=T)
+
+# We have to tin the train and the test data
+thin(train,
+     lat.col = "Latitude",
+     long.col = "Longitude",
+     spec.col = "species",
+     thin.par = 10,
+     reps = 100,
+     out.dir = "data/SpeciesOccurences/",
+     out.base = "TrainThinned")
+
+thin(test,
+     lat.col = "Latitude",
+     long.col = "Longitude",
+     spec.col = "species",
+     thin.par = 10,
+     reps = 100,
+     out.dir = "data/SpeciesOccurences/",
+     out.base = "TestThinned")
+
+# Now lets crop the landuse variables to the Ethiopia extent
+
+# Create path to current land use and brick the data
+pathLuhCurrent <- "data/luh/states.nc"
+
+# Create variable of layers names
+layers <- c("primf","primn","secdf","secdn","urban","c3ann","c4ann","c3per","c4per","c3nfx","pastr","range","secmb","secma")
+
+# Create for loop to resample current luh data to Ethiopia extent
+for(i in layers){
+  current <- brick(pathLuhCurrent, varname = i)
+  current <- crop(current, e)
+  current <- mean(current[[1121:1151]])
+  current <- resample(current, s_cropped)
+  writeRaster(current, paste0(pathMax,i,".asc"),
+              format = "ascii", overwrite = T)
+}
+
+primn <- raster("InputMaxent/primn.asc")
+plot(primn)
+
+# Load landcover and elevation data in R
+pathLandcover <- "data/EthiopiaLandcover/"
+landcover <- raster(paste0(pathLandcover, "ETH_msk_cov.gri"))
+plot(landcover)
+
+pathElevation <- "data/Elevation/"
+elevation <- raster(paste0(pathElevation, "ETH_msk_alt.gri"))
+plot(elevation)
+
+
+
+
+
+
 
 
 
