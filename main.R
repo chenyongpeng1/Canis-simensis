@@ -37,16 +37,16 @@ HabitatPatchesSf <- st_as_sf(HabitatPatches)
 # Make separate polygons of different habitats #
 
 # First for the multipolygon landscapes
-BaleMountains <- st_union(HabitatPatchesSf[1,"LEGEND"], HabitatPatchesSf[7,"LEGEND"])
+BaleMountains <- st_union(st_geometry(HabitatPatchesSf[1,"LEGEND"]), st_geometry(HabitatPatchesSf[7,"LEGEND"]))
 BaleMountains <- BaleMountains[,-2]
 BaleMountains <- as_Spatial(BaleMountains)
 
-ArsiMountains <- st_union(HabitatPatchesSf[4,"LEGEND"], HabitatPatchesSf[5,"LEGEND"])
+ArsiMountains <- st_union(st_geometry(HabitatPatchesSf[4,"LEGEND"]), st_geometry(HabitatPatchesSf[5,"LEGEND"]))
 ArsiMountains <- ArsiMountains[,-2]
 ArsiMountains <- as_Spatial(ArsiMountains)
 
-NorthWollo <- st_union(HabitatPatchesSf[9,"LEGEND"], HabitatPatchesSf[10,"LEGEND"],
-                       HabitatPatchesSf[11,"LEGEND"], HabitatPatchesSf[12,"LEGEND"])
+NorthWollo <- st_union(st_geometry(HabitatPatchesSf[9,"LEGEND"]), st_geometry(HabitatPatchesSf[10,"LEGEND"]),
+                       st_geometry(HabitatPatchesSf[11,"LEGEND"]), st_geometry(HabitatPatchesSf[12,"LEGEND"]))
 NorthWollo <- NorthWollo[,-2]
 NorthWollo <- as_Spatial(NorthWollo)
 
@@ -297,8 +297,18 @@ if(exists(x = "occurencesMtMenz")){
 plot(Ethiopia)
 points(OccurencesPoints$Longitude, OccurencesPoints$Latitude)
 
-# Get a 30% testing set and a 70% training set and export them to your folder.
+# Thin OccurencesPoints
+thin(OccurencesPoints,
+     lat.col = "Latitude",
+     long.col = "Longitude",
+     spec.col = "species",
+     thin.par = 10,
+     reps = 100,
+     out.dir = "data/SpeciesOccurences/",
+     out.base = "OccurencesThinned")
 
+
+# Get a 30% testing set and a 70% training set and export them to your folder.
 smp_size <- floor(0.7 * nrow(OccurencesPoints))
 set.seed(123)
 train_ind <- sample(seq_len(nrow(OccurencesPoints)), size = smp_size)
@@ -342,24 +352,6 @@ pathMax <- "InputMaxent/"
 writeRaster(s_cropped, paste0(pathMax, names(s_cropped)),
             bylayer=T, format="ascii", overwrite=T)
 
-# We have to tin the train and the test data
-thin(train,
-     lat.col = "Latitude",
-     long.col = "Longitude",
-     spec.col = "species",
-     thin.par = 10,
-     reps = 100,
-     out.dir = "data/SpeciesOccurences/",
-     out.base = "TrainThinned")
-
-thin(test,
-     lat.col = "Latitude",
-     long.col = "Longitude",
-     spec.col = "species",
-     thin.par = 10,
-     reps = 100,
-     out.dir = "data/SpeciesOccurences/",
-     out.base = "TestThinned")
 
 # Now lets crop the landuse variables to the Ethiopia extent
 
@@ -379,9 +371,6 @@ for(i in layers){
               format = "ascii", overwrite = T)
 }
 
-primn <- raster("InputMaxent/primn.asc")
-plot(primn)
-
 # Load landcover and elevation data in R
 pathLandcover <- "data/EthiopiaLandcover/"
 landcover <- raster(paste0(pathLandcover, "ETH_msk_cov.gri"))
@@ -391,11 +380,26 @@ pathElevation <- "data/Elevation/"
 elevation <- raster(paste0(pathElevation, "ETH_msk_alt.gri"))
 plot(elevation)
 
+# Resample elevation to s_cropped
+elevation<- resample(elevation, s_cropped)
 
+# Write elevation to InputMaxent
+writeRaster(elevation, paste0(pathMax, "elevation.asc"),
+            format = "ascii", overwrite = T)
 
-
-
-
+# Check wether all rasters have the same resolution and extent
+bio12 <- raster("InputMaxent/bio12.asc")
+range <- raster("InputMaxent/range.asc")
+elevation <- raster("InputMaxent/elevation.asc")
+plot(bio12)
+plot(range)
+plot(elevation)
+extent(bio12)
+extent(range)
+extent(elevation)
+res(bio12)
+res(elevation)
+res(range)
 
 
 
