@@ -387,7 +387,7 @@ elevation<- resample(elevation, s_cropped)
 writeRaster(elevation, paste0(pathMax, "elevation.asc"),
             format = "ascii", overwrite = T)
 
-# Check wether all rasters have the same resolution and extent
+# Check whether all rasters have the same resolution and extent
 bio12 <- raster("InputMaxent/bio12.asc")
 range <- raster("InputMaxent/range.asc")
 elevation <- raster("InputMaxent/elevation.asc")
@@ -402,6 +402,90 @@ res(elevation)
 res(range)
 
 
+# Have a look at the maxent outputs
+
+# The maxent output with all variables
+MaxentCurrent <- raster("MaxentCurrent/Canis_simensis.asc")
+plot(MaxentCurrent)
+
+# The maxent output with the 8 most important variables
+MaxentCurrent8 <- raster("MaxentCurrent8/Canis_simensis.asc")
+plot(MaxentCurrent8)
+
+# The maxent output with the 8 most important variables and secondary land
+# mean age (the most important variable of the land use types)
+MaxentCurrent9 <- raster("MaxentCurrent9/Canis_simensis.asc")
+plot(MaxentCurrent9)
+
+# Create suitablity maps
+
+# The maxent output with all variables
+MaxResCurrent <- read.csv("MaxentCurrent/maxentResults.csv")
+MaxentCurrentSuit <- MaxentCurrent > MaxResCurrent$Maximum.training.sensitivity.plus.specificity.Logistic.threshold
+plot(MaxentCurrentSuit)
+
+# The maxent output with the 8 most important variables
+MaxResCurrent8 <- read.csv("MaxentCurrent8/maxentResults.csv")
+MaxentCurrentSuit8 <- MaxentCurrent8 > MaxResCurrent8$Maximum.training.sensitivity.plus.specificity.Logistic.threshold
+plot(MaxentCurrentSuit8)
+
+# The maxent output with the 8 most important variables and secondary land
+# mean age (the most important variable of the land use types)
+MaxResCurrent9 <- read.csv("MaxentCurrent9/maxentResults.csv")
+MaxentCurrentSuit9 <- MaxentCurrent9 > MaxResCurrent9$Maximum.training.sensitivity.plus.specificity.Logistic.threshold
+plot(MaxentCurrentSuit9)
 
 
+# Validate models
+
+# Import test occurrences, delete the species column, extract the frequency of 
+# test-occurrences predicted suitable and non-suitable
+MaxentCurrent_test <- read.csv("data/SpeciesOccurences/test.csv")
+MaxentCurrent_test$species<-NULL
+MaxentCurrent_testrestult <- extract(MaxentCurrentSuit, MaxentCurrent_test)
+
+MaxentCurrent8_testrestult <- extract(MaxentCurrentSuit8, MaxentCurrent_test)
+
+MaxentCurrent9_testrestult <- extract(MaxentCurrentSuit9, MaxentCurrent_test)
+
+# define P, K, and N. P is equal to the frequency of 1’s (suitable cells) divided 
+# by the total number of cells (suitable cells + non-suitable cells). K is the total 
+# number of test-occurrences predicted suitable (value of 1). N is the total number
+# of test-occurrences. na.rm=TRUE means that all values with NA (none existent)
+# should be deleted
+MaxentCurrent_P <- freq(MaxentCurrentSuit, value=1) / (freq(MaxentCurrentSuit, value=1) + freq(MaxentCurrentSuit, value=0))
+MaxentCurrent_K <- sum(MaxentCurrent_testrestult == 1, na.rm=TRUE)
+MaxentCurrent_N <- length(MaxentCurrent_testrestult)
+
+MaxentCurrent8_P <- freq(MaxentCurrentSuit8, value=1) / (freq(MaxentCurrentSuit8, value=1) + freq(MaxentCurrentSuit8, value=0))
+MaxentCurrent8_K <- sum(MaxentCurrent8_testrestult == 1, na.rm=TRUE)
+MaxentCurrent8_N <- length(MaxentCurrent8_testrestult)
+
+MaxentCurrent9_P <- freq(MaxentCurrentSuit9, value=1) / (freq(MaxentCurrentSuit9, value=1) + freq(MaxentCurrentSuit9, value=0))
+MaxentCurrent9_K <- sum(MaxentCurrent9_testrestult == 1, na.rm=TRUE)
+MaxentCurrent9_N <- length(MaxentCurrent9_testrestult)
+
+#calculate the success, and do the binomial test
+succes <- MaxentCurrent_K/MaxentCurrent_N
+binom.test(MaxentCurrent_K, MaxentCurrent_N, p = MaxentCurrent_P,alternative = c("two.sided", "less", "greater"),conf.level = 0.95)
+
+succes8 <- MaxentCurrent8_K/MaxentCurrent8_N
+binom.test(MaxentCurrent8_K, MaxentCurrent8_N, p = MaxentCurrent8_P,alternative = c("two.sided", "less", "greater"),conf.level = 0.95)
+
+succes9 <- MaxentCurrent9_K/MaxentCurrent9_N
+binom.test(MaxentCurrent9_K, MaxentCurrent9_N, p = MaxentCurrent9_P,alternative = c("two.sided", "less", "greater"),conf.level = 0.95)
+
+
+## Future variables ##
+
+# Create directory to store future rasters
+dirFuture <- "inputFuture/"
+if(!dir.exists(dirFuture)){
+  dir.create(dirFuture)
+}
+
+
+## Get climate variables from future and write them to dirFuture ##
+
+#
 
