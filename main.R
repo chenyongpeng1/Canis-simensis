@@ -487,5 +487,42 @@ if(!dir.exists(dirFuture)){
 
 ## Get climate variables from future and write them to dirFuture ##
 
-#
+# Load the future tif
+future <- stack("data/worldclimfuture/future_data.tif")
 
+# Get it to the same extent as Ethiopia
+e
+future_cropped <- crop(future, e)
+extent(future_cropped)
+
+# Write seperate rasters to dirFuture
+for(i in 1:nlayers(future_cropped)){
+  band <- future_cropped[[i]]
+  writeRaster(band, paste0(dirFuture, "bio", i, ".asc"))
+}
+
+# Check a layer
+bio4_future <- raster(paste0(dirFuture, "bio4.asc"))
+plot(bio4_future)
+extent(bio4_future)
+res(bio4_future)
+
+## Get landuse variables from future and write them to dirFuture ##
+layers
+for(i in layers){
+  
+  # Load the future.nc file in R
+  futurelanduse <- brick("data/luhfuture/future.nc", varname = i)
+  
+  # Get information of the years 2081-2100 and crop to extent Ethiopia
+  futurelanduse <- crop(mean(futurelanduse[[67:86]]), e)
+  
+  # Resample to bio4_future cellsize
+  futurelanduse <- resample(futurelanduse, bio4_future)
+  
+  # Write to # Write layers to dirFuture
+  writeRaster(futurelanduse, paste0(dirFuture, i, ".asc"), format = "ascii", overwrite = T)
+}
+
+# At last, write elevation to future variables
+writeRaster(elevation, filename = paste0(dirFuture, "elevation.asc"), format = "ascii", overwrite = T)
