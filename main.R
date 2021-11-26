@@ -371,6 +371,23 @@ for(i in layers){
               format = "ascii", overwrite = T)
 }
 
+
+## At last we want to write the population raster to InputMax ##
+populationEth <- raster("data/EthiopiaPopulation/eth_pop.grd")
+
+# Resample to s_cropped
+populationEth <- resample(populationEth, s_cropped)
+
+
+# Check populationEth
+res(populationEth)
+extent(populationEth)
+plot(populationEth)
+
+# Write populationEth to input max
+writeRaster(populationEth, "InputMaxent/populationEth.asc",
+            format = "ascii", overwrite = T)
+
 # Load landcover and elevation data in R
 pathLandcover <- "data/EthiopiaLandcover/"
 landcover <- raster(paste0(pathLandcover, "ETH_msk_cov.gri"))
@@ -491,14 +508,15 @@ if(!dir.exists(dirFuture)){
 future <- stack("data/worldclimfuture/future_data.tif")
 
 # Get it to the same extent as Ethiopia
-e
+extent <- extent(Ethiopia)
+e <- c(extent@xmin, extent@xmax, extent@ymin, extent@ymax)
 future_cropped <- crop(future, e)
 extent(future_cropped)
 
 # Write seperate rasters to dirFuture
 for(i in 1:nlayers(future_cropped)){
   band <- future_cropped[[i]]
-  writeRaster(band, paste0(dirFuture, "bio", i, ".asc"))
+  writeRaster(band, paste0(dirFuture, "bio", i, ".asc"), overwrite = T)
 }
 
 # Check a layer
@@ -526,3 +544,139 @@ for(i in layers){
 
 # At last, write elevation to future variables
 writeRaster(elevation, filename = paste0(dirFuture, "elevation.asc"), format = "ascii", overwrite = T)
+
+
+# Final check of layer extents and resolutions
+bio4_future <- raster(paste0(dirFuture, "bio4.asc"))
+bio6_future <- raster(paste0(dirFuture, "bio6.asc"))
+bio6 <- raster(paste0(pathMax, "bio6.asc"))
+pastr <- raster(paste0(dirFuture, "pastr.asc"))
+c4per <- raster(paste0(dirFuture, "c4per.asc"))
+c4percur <- raster(paste0(pathMax, "c4per.asc"))
+elev <- raster(paste0(dirFuture, "elevation.asc"))
+plot(bio4_future)
+plot(bio6)
+plot(bio6_future)
+plot(pastr)
+plot(c4per)
+plot(c4percur)
+plot(elev)
+extent(bio4_future)
+extent(bio6_future)
+extent(bio6)
+extent(c4per)
+extent(c4percur)
+extent(pastr)
+extent(elev)
+res(bio6_future)
+res(bio6)
+res(bio4_future)
+res(c4per)
+res(c4percur)
+res(pastr)
+res(elev)
+
+# Still having res and extent problems? Workaround:
+inputmapsFut = stack(list.files("inputFuture", pattern=".asc", full.names = T))
+
+# Write each layer in the stack to inputFuture
+for(i in names(inputmapsFut)){
+  writeRaster(inputmapsFut[[i]], filename = paste0(dirFuture, i, ".asc"),
+              overwrite = T, format = "ascii")
+}
+
+files <- list.files(path = "inputFuture", full.names = T)
+futureStackFiles <- stack(files)
+writeRaster(futureStackFiles, names(futureStackFiles), bylayer = T,
+            overwrite = T, format = "ascii")
+
+bio1Fut <- raster("inputFuture/bio1.asc")
+
+# Visualize results of Maxent
+
+# The maxent asc outputs with climate change
+predictionFut <- raster("MaxentFuture/Canis_simensis_inputFuture.asc")
+plot(predictionFut)
+
+predictionFut8 <- raster("MaxentFuture8/Canis_simensis_inputFuture8.asc")
+plot(predictionFut8)
+
+predictionFut9 <- raster("MaxentFuture9/Canis_simensis_inputFuture9.asc")
+plot(predictionFut9)
+
+# The suitablility maps
+MaxResFuture <- read.csv("MaxentFuture/maxentResults.csv")
+MaxentFutureSuit <- predictionFut > MaxResFuture$Maximum.training.sensitivity.plus.specificity.Logistic.threshold
+plot(MaxentFutureSuit)
+
+MaxResFut8 <- read.csv("MaxentFuture8/maxentResults.csv")
+MaxentFutureSuit8 <- predictionFut8 > MaxResFut8$Maximum.training.sensitivity.plus.specificity.Logistic.threshold
+plot(MaxentFutureSuit8)
+
+MaxResFut9 <- read.csv("MaxentCurrent9/maxentResults.csv")
+MaxentFutureSuit9 <- predictionFut9 > MaxResFut9$Maximum.training.sensitivity.plus.specificity.Logistic.threshold
+plot(MaxentFutureSuit9)
+
+
+## Compare future and current ##
+
+# Maxent asc output
+plot(MaxentCurrent)
+plot(MaxentCurrent8)
+plot(MaxentCurrent9)
+
+plot(predictionFut)
+plot(predictionFut8)
+plot(predictionFut9)
+
+# Suitability maps
+plot(MaxentCurrentSuit)
+plot(MaxentCurrentSuit8)
+plot(MaxentCurrentSuit9)
+
+plot(MaxentFutureSuit)
+plot(MaxentFutureSuit8)
+plot(MaxentFutureSuit9)
+
+
+## Zonation ##
+
+# Create the correct variables for the zonation run
+bio1 <- raster("InputMaxent/bio1.asc")
+
+# The code below creates a matrix that specifies in the first two columns the
+# range the values in the a raster can take. Inf stands for infinity. In the 
+# third column the value that should be assigned to all values defined by the 
+# range you specified is stated (1). This matrix is then used to reclassify a 
+# raster.
+m <- c(-Inf, Inf, 1)
+rclmat <- matrix(m, ncol=3, byrow=TRUE)
+bio <- reclassify(bio1, rclmat)
+
+# Check bio
+plot(bio)
+freq(bio)
+
+# Population ethiopia
+population <- raster("InputMaxent/populationEth.asc") # load it
+population <- population * -1 # resample it to negative values to make high pop negative
+population <- crop(population, bio) # crop it to bio extent
+population <- resample(population, bio) # resample it to bio cell size
+plot(population) # view population
+
+# Create folder input zonation
+pathZonation <- "ZonationInput/"
+if(!dir.exists(pathZonation)){
+  dir.create(pathZonation)
+}
+
+# Write population to path
+writeRaster(population, paste0(pathZonation, "population.asc"), format = "ascii", overwrite = T)
+
+# Write best current and future maxent output to path
+Canis_simensis_Current <- raster("MaxentCurrent9/Canis_simensis.asc")
+writeRaster(Canis_simensis_Current, paste0(pathZonation, "Canis_simensis_Current.asc"), format = "ascii", overwrite = T)
+Canis_simensis_Future <- raster("MaxentFuture9/Canis_simensis_InputFuture9.asc")
+writeRaster(Canis_simensis_Future, paste0(pathZonation, "Canis_simensis_Future.asc"), format = "ascii", overwrite = T)
+
+
