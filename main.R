@@ -10,6 +10,7 @@ if(!"rgdal" %in% rownames(installed.packages())){install.packages("rgdal")}
 if(!"sf" %in% rownames(installed.packages())){install.packages("sf")}
 if(!"ncdf4" %in% rownames(installed.packages())){install.packages("ncdf4")}
 if(!"spThin" %in% rownames(installed.packages())){install.packages("spThin")}
+if(!"rgeos" %in% rownames(installed.packages())){install.packages("rgeos")}
 
 # Load required packages
 library(raster)
@@ -17,6 +18,7 @@ library(rgdal)
 library(sf)
 library(ncdf4)
 library(spThin)
+library(rgeos)
 
 # Create data directory
 dir <- "data"
@@ -296,6 +298,9 @@ if(exists(x = "occurencesMtMenz")){
 # Check OccurencesPoints dataset
 plot(Ethiopia)
 points(OccurencesPoints$Longitude, OccurencesPoints$Latitude)
+
+# Write OccurencesPoints to csc
+write.csv(x = OccurencesPoints, file = "data/SpeciesOccurences/OccurencesPoints.csv")
 
 # Thin OccurencesPoints
 thin(OccurencesPoints,
@@ -679,4 +684,94 @@ writeRaster(Canis_simensis_Current, paste0(pathZonation, "Canis_simensis_Current
 Canis_simensis_Future <- raster("MaxentFuture9/Canis_simensis_InputFuture9.asc")
 writeRaster(Canis_simensis_Future, paste0(pathZonation, "Canis_simensis_Future.asc"), format = "ascii", overwrite = T)
 
+
+## View the outputs of Zonation in R ##
+
+# Load the outputs tiffs in R
+ZonCurrent <- raster("ZonationOutputs/Canis_simensis_Current/outputs/Canis_simensis_Current.ABF_EBLP50.rank.compressed.tif")
+ZonFuture <-raster("ZonationOutputs/Canis_simensis_Future/outputs/Canis_simensis_Future.ABF_EBLP50.rank.compressed.tif")
+ZonCurFut <- raster("ZonationOutputs/Canis_simensis_CurrentFuture/outputs/Canis_simensis_CurrentFuture.ABF_EBLP50.rank.compressed.tif")
+
+# Turn the raster into a dataframe and change name of third column
+ZonCurrentDF <- as.data.frame(ZonCurrent, row.names = NULL, optional = F, xy = T, na.rm = T)
+colnames(ZonCurrentDF)[3] <- "Zonation Current"
+
+ZonFutureDF <- as.data.frame(ZonFuture, row.names = NULL, optional = F, xy = T, na.rm = T)
+colnames(ZonFutureDF)[3] <- "Zonation Future"
+
+ZonCurFutDF <- as.data.frame(ZonCurFut, row.names = NULL, optional = F, xy = T, na.rm = T)
+colnames(ZonCurFutDF)[3] <- "Zonation Current Future"
+
+# Merge dataframes and write them to csv
+ZonationOutput <- merge(ZonCurrentDF, ZonFutureDF, by.x = c("x", "y"),
+                        by.y = c("x", "y"), all.x = T, all.y = T)
+ZonationOutput <- merge(ZonationOutput, ZonCurFutDF, by.x = c("x", "y"),
+                        by.y = c("x", "y"), all.x = T, all.y = T)
+write.csv(ZonationOutput, file = "ZonationOutputs/ZonationOutput.csv")
+
+# Get only 99% suitable places from zonation
+ZonCurrent99 <- ZonCurrent > 0.990
+ZonFuture99 <- ZonFuture > 0.990
+PAs <- ZonCurrent99 + (ZonFuture99*2)
+plot(ZonCurrent99)
+plot(ZonFuture99)
+
+## Ecological restoration potention sites ##
+
+# Mask raster
+bio1 <- raster("InputMaxent/bio1.asc")
+m <- c(-Inf, Inf, 1)
+rclmat <- matrix(m, ncol = 3, byrow = T)
+bio <- reclassify(bio1, rclmat)
+
+# Load and reclassify Protected Areas
+PA <- readOGR("ProtectedAreas/WDPA_WDOECM_Nov2021_Public_ETH_shp/WDPA_WDOECM_Nov2021_Public_ETH_shp_0", "WDPA_WDOECM_Nov2021_Public_ETH_shp-polygons")
+PA1 <- rasterize(PA, bio, fun = "last", background = NA, mask = T, update = F)
+PA1[is.na(PA1)] <- 0
+PA2 <- PA1 + bio
+m2 <- c(-Inf, 1.5, 0, 1.5, Inf, 2)
+rclmat2 <- matrix(m2, ncol = 3, byrow = T)
+PA3 <- reclassify(PA2, rclmat2)
+
+# Get Zonation areas
+areas <- raster("ZonationOutputs/Canis_simensis_CurrentFuture/outputs/Canis_simensis_CurrentFuture.ABF_EBLP50.rank.compressed.tif")
+areas99 <- areas > 0.99
+plot(areas99)
+
+# Combine zonation areas with protected areas
+overlap <- areas99 + PA3
+poly_overlap = rasterToPolygons(overlap)
+raster::shapefile(poly_overlap, "ZonationOutputs/pa_network.shp", overwrite = T)
+
+poly_overlap <- rgeos::createSPComment(poly_overlap)
+shapefile(poly_overlap, "ZonationOutputs/pa_network.shp", overwrite = T)
+
+# Plot outputs
+plot(MaxentCurrent)
+plot(MaxentCurrent8)
+plot(MaxentCurrent9, main = "Current")
+plot(predictionFut)
+plot(predictionFut8)
+plot(predictionFut9, main = "Future (2081-2100)")
+plot(MaxentCurrentSuit)
+plot(MaxentCurrentSuit8)
+plot(MaxentCurrentSuit9, main = "Suitable Current")
+plot(MaxentFutureSuit)
+plot(MaxentFutureSuit8)
+plot(MaxentFutureSuit9, main = "Suitable Future (2081-2100)")
+
+plot(ZonCurFut)
+plot(ZonCurrent)
+plot(ZonFuture)
+plot(ZonCurrent99)
+plot(ZonFuture99)
+plot(areas99, main  = "Zonation output current + future")
+plot(PAs, main  = "Current and future best 0.99",
+     xlab = "            1 = Current range Canis simensis
+             2 = Future range Canis simensis
+             3 = Overlap", cex.lab = 0.65)
+plot(overlap, main = "Overlap PAs and suitable habitat",
+     xlab = "1 = important for Canis simensis
+             2 = Protected Areas
+             3 = Overlap", cex.lab = 0.65)
 
